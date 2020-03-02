@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+  <body>
+    <input id="entry" type="text">
+    <button type="button" name="button" onclick="add()">add</button>
+    <button type="button" name="button" onclick="subtract()">subtract</button>
+    <button type="button" name="button" onclick="multiply()">multiply</button>
+    <button type="button" name="button" onclick="divide()">divide</button>
+    <button type="button" name="button" onclick="equals(3, 4)">equals</button>
+
+    <script>
+/*clicking operator functions trigger storage and clearance of number typed into textbox, as well as initializing a signal variable identifying which operator has been invoked, both of which will be passed on to the equals function which will also take the next number in the text field
+
+issue: first design ideas may favor a simplistic vision in which the user only enters two numbers before getting the result, but in a real calculator, chaining operations is common.
+account for parentheses?
+*/
+
+/*
+Maybe have 2 arrays, one storing the entered values, in order, and the other storing the operators.  Then, when the equals button is pushed, shift the elements out of the array to perform the operations
+
+search for * or / to honor order of operations
+
+search for "(" and ")" and perform those ops first?
+*/
+
+      var numbers = [];
+      var ops = [];
+      document.getElementById("entry").value = "";
+
+      function add(){
+        entry = document.getElementById("entry");
+        ops.push("+");
+    //    console.log("ops is " + ops);
+        numbers.push(entry.value);
+        entry.value = "";
+      }
+
+      function subtract(){
+        entry = document.getElementById("entry");
+        numbers.push(entry.value);
+        ops.push("-");
+      //  console.log("ops is " + ops);
+        entry.value = "";
+      }
+
+      function multiply(){
+        entry = document.getElementById("entry");
+        numbers.push(entry.value);
+        ops.push("*");
+    //    console.log("ops is " + ops);
+        entry.value = "";
+      }
+
+      function divide(){
+        entry = document.getElementById("entry");
+        numbers.push(entry.value);
+        ops.push("/");
+      //  console.log("ops is " + ops);
+        entry.value = "";
+      }
+
+      function equals()
+      {
+        var result = parseInt(numbers[0]);
+        numbers.shift();
+
+        entry = document.getElementById("entry");
+      //store the final number to be operated on
+        numbers.push(entry.value);
+      //reset the field to blank
+        entry.value = "";
+        console.log("just before while loop, ops is " + ops +" and numbers is " + numbers);
+        while(numbers.length > 0){
+          //there are at least 2 values in the array, so we can take out 2 and perform the operation
+          op = ops.shift();
+          console.log("ops is " + ops + " and op is " + op);
+            switch(op) {
+                case "+":
+                    result += (parseInt(numbers.shift()));
+                    break;
+                case "-":
+                    result -= parseInt((numbers.shift()));
+                    break;
+                case "*":
+                  result *= parseInt((numbers.shift()));
+                  break;
+                case "/":
+                  result /= parseInt((numbers.shift()));
+                  break;
+                }
+              }
+        console.log(result);
+    }
+    </script>
+  </body>
+</html>
