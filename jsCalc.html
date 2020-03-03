@@ -6,11 +6,24 @@
   </head>
   <body>
     <input id="entry" type="text">
+    <button type="button" name="button" onclick="entry.value += '1'">1</button>
+    <button type="button" name="button" onclick="entry.value += '2'">2</button>
+    <button type="button" name="button" onclick="entry.value += '3'">3</button>
+    <button type="button" name="button" onclick="entry.value += '4'">4</button>
+    <button type="button" name="button" onclick="entry.value += '5'">5</button>
+    <button type="button" name="button" onclick="entry.value += '6'">6</button>
+    <button type="button" name="button" onclick="entry.value += '7'">7</button>
+    <button type="button" name="button" onclick="entry.value += '8'">8</button>
+    <button type="button" name="button" onclick="entry.value += '9'">9</button>
+    <button type="button" name="button" onclick="entry.value += '0'">0`</button>
+
     <button type="button" name="button" onclick="add()">add</button>
     <button type="button" name="button" onclick="subtract()">subtract</button>
     <button type="button" name="button" onclick="multiply()">multiply</button>
     <button type="button" name="button" onclick="divide()">divide</button>
-    <button type="button" name="button" onclick="equals(3, 4)">equals</button>
+    <button type="button" name="button" onclick="findMD()">equals</button>
+    <button type="button" name="button" onclick="clearEntry()">Clear Entry</button>
+    <button type="button" name="button" onclick="clearIt()">clear</button>
 
     <script>
 /*clicking operator functions trigger storage and clearance of number typed into textbox, as well as initializing a signal variable identifying which operator has been invoked, both of which will be passed on to the equals function which will also take the next number in the text field
@@ -20,80 +33,129 @@ account for parentheses?
 */
 
 /*
-Maybe have 2 arrays, one storing the entered values, in order, and the other storing the operators.  Then, when the equals button is pushed, shift the elements out of the array to perform the operations
+Maybe have 2 arrays, one storing the entered values, in order, and the other storing the ops.  Then, when the equals button is pushed, shift the elements out of the array to perform the operations
 
 search for * or / to honor order of operations
 
 search for "(" and ")" and perform those ops first?
 */
-
       var numbers = [];
       var ops = [];
-      document.getElementById("entry").value = "";
+      var entry = document.getElementById("entry");
+      entry.value = "";
+      entry.focus();
 
       function add(){
-        entry = document.getElementById("entry");
         ops.push("+");
     //    console.log("ops is " + ops);
         numbers.push(entry.value);
         entry.value = "";
+        entry.focus();
       }
 
       function subtract(){
-        entry = document.getElementById("entry");
         numbers.push(entry.value);
         ops.push("-");
-      //  console.log("ops is " + ops);
         entry.value = "";
+        entry.focus();
       }
 
       function multiply(){
-        entry = document.getElementById("entry");
         numbers.push(entry.value);
         ops.push("*");
     //    console.log("ops is " + ops);
         entry.value = "";
+        entry.focus();
       }
 
       function divide(){
-        entry = document.getElementById("entry");
         numbers.push(entry.value);
         ops.push("/");
       //  console.log("ops is " + ops);
         entry.value = "";
+        entry.focus();
       }
 
-      function equals()
-      {
-        var result = parseInt(numbers[0]);
-        numbers.shift();
-
-        entry = document.getElementById("entry");
-      //store the final number to be operated on
-        numbers.push(entry.value);
-      //reset the field to blank
+      function clearIt(){
         entry.value = "";
-        console.log("just before while loop, ops is " + ops +" and numbers is " + numbers);
-        while(numbers.length > 0){
-          //there are at least 2 values in the array, so we can take out 2 and perform the operation
-          op = ops.shift();
-          console.log("ops is " + ops + " and op is " + op);
-            switch(op) {
-                case "+":
-                    result += (parseInt(numbers.shift()));
-                    break;
-                case "-":
-                    result -= parseInt((numbers.shift()));
-                    break;
-                case "*":
-                  result *= parseInt((numbers.shift()));
-                  break;
-                case "/":
-                  result /= parseInt((numbers.shift()));
-                  break;
-                }
+        numbers = [];
+        ops = [];
+        entry.focus();
+      }
+
+      function clearEntry(){
+        entry.value = "";
+        numbers.pop;
+        entry.focus();
+      }
+
+      function findMD()
+      {
+        numbers.push(entry.value);
+        console.log(numbers);
+        console.log(ops);
+
+        while(true){
+          times = ops.indexOf("*");
+          div = ops.indexOf("/");
+          //both * and / are in the operator array:
+          if(times!= -1 && div != -1)
+          {
+            //choose the one closer to the front of the array
+            if(times < div)
+            {
+              console.log("times at " + times);
+              //multiplies the two numbers together keeping the product at the index of the 1st factor, and removing the index of the 2nd factor.
+              console.log("1 " + numbers);
+
+              numbers[times] = numbers[times] * numbers[times + 1];
+              console.log("2 " + numbers);
+
+              numbers.splice(times + 1, 1);
+              console.log("3 " + numbers);
+
+              ops.splice(times,1);
+            }else{
+                console.log("div at " + div);
+                numbers[div] = numbers[div]/numbers[div + 1];
+                numbers.splice(div + 1, 1);
+                ops.splice(div,1);
               }
+          //they're not both there
+          }else if(times != -1){
+            console.log("times at " + times);
+            numbers[times] = numbers[times] * numbers[times + 1];
+            numbers.splice(times + 1, 1);
+            ops.splice(times,1);
+
+            }else if(div!= -1){
+              console.log("div at " + div);
+              numbers[div] = numbers[div]/numbers[div + 1];
+              numbers.splice(div + 1, 1);
+              ops.splice(div,1);
+            }else{
+              break;
+            }
+          console.log(ops);
+          console.log(numbers)
+        }
+        addEmUp(numbers);
+      }
+
+      function addEmUp()
+      {
+        //start off the sum with the first element
+        var result = parseInt(numbers.shift());
+        while(numbers.length > 0){
+          op = ops.shift();
+          if(op=="+"){
+            result += (parseInt(numbers.shift()));
+          }else{
+            result -= parseInt((numbers.shift()));
+          }
+        }
         console.log(result);
+        entry.value = result;
     }
     </script>
   </body>
