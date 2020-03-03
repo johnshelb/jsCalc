@@ -15,7 +15,9 @@
     <button type="button" name="button" onclick="entry.value += '7'">7</button>
     <button type="button" name="button" onclick="entry.value += '8'">8</button>
     <button type="button" name="button" onclick="entry.value += '9'">9</button>
-    <button type="button" name="button" onclick="entry.value += '0'">0`</button>
+    <button type="button" name="button" onclick="entry.value += '0'">0</button>
+    <button type="button" name="button" onclick="entry.value += '.'">.</button>
+    <button type="button" name="button" onclick="entry.value= parseFloat(entry.value)/100">%</button>
 
     <button type="button" name="button" onclick="add()">add</button>
     <button type="button" name="button" onclick="subtract()">subtract</button>
@@ -89,6 +91,10 @@ search for "(" and ")" and perform those ops first?
         entry.focus();
       }
 
+      function findParens(){
+        //whenever adding paren to numbers array, also add it to ops array, to keep one-to-one index correspondence, then remove them from both after processing
+      }
+
       function findMD()
       {
         numbers.push(entry.value);
@@ -145,13 +151,13 @@ search for "(" and ")" and perform those ops first?
       function addEmUp()
       {
         //start off the sum with the first element
-        var result = parseInt(numbers.shift());
+        var result = parseFloat(numbers.shift());
         while(numbers.length > 0){
           op = ops.shift();
           if(op=="+"){
-            result += (parseInt(numbers.shift()));
+            result += (parseFloat(numbers.shift()));
           }else{
-            result -= parseInt((numbers.shift()));
+            result -= parseFloat((numbers.shift()));
           }
         }
         console.log(result);
