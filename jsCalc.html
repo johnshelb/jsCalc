@@ -7,7 +7,7 @@
   <body>
     <input id="entry" type="text">
     <button type="button" name="button" onclick="entry.value += '1'">1</button>
-    <button type="button" name="button" onclick="entry.value += '2'">2</button>
+    <button type="button" name="button" onclick="entry.value  += '2'">2</button>
     <button type="button" name="button" onclick="entry.value += '3'">3</button>
     <button type="button" name="button" onclick="entry.value += '4'">4</button>
     <button type="button" name="button" onclick="entry.value += '5'">5</button>
@@ -17,13 +17,13 @@
     <button type="button" name="button" onclick="entry.value += '9'">9</button>
     <button type="button" name="button" onclick="entry.value += '0'">0</button>
     <button type="button" name="button" onclick="entry.value += '.'">.</button>
-    <button type="button" name="button" onclick="entry.value= parseFloat(entry.value)/100">%</button>
+    <button type="button" name="button" onclick="entry.value = entry.value/100">%</button>
 
     <button type="button" name="button" onclick="add()">add</button>
     <button type="button" name="button" onclick="subtract()">subtract</button>
     <button type="button" name="button" onclick="multiply()">multiply</button>
     <button type="button" name="button" onclick="divide()">divide</button>
-    <button type="button" name="button" onclick="findMD()">equals</button>
+    <button type="button" name="button" onclick="resolveParens()">equals</button>
     <button type="button" name="button" onclick="clearEntry()">Clear Entry</button>
     <button type="button" name="button" onclick="clearIt()">clear</button>
 
@@ -48,9 +48,9 @@ search for "(" and ")" and perform those ops first?
       entry.focus();
 
       function add(){
+        numbers.push(entry.value);
         ops.push("+");
     //    console.log("ops is " + ops);
-        numbers.push(entry.value);
         entry.value = "";
         entry.focus();
       }
@@ -91,19 +91,106 @@ search for "(" and ")" and perform those ops first?
         entry.focus();
       }
 
-      function findParens(){
-        //whenever adding paren to numbers array, also add it to ops array, to keep one-to-one index correspondence, then remove them from both after processing
+
+      function resolveParens(){
+        numbers.push(entry.value);
+
+        console.log("at beginning, numbers is " + numbers + " and ops is " + ops);
+        //get the final entry
+        //do this for all sets of parens, break if no more open parens
+        while(true)
+        {
+          openIndex = -1;//will be reset with highest index of open paren, if any
+          closeIndex = -1;//will be reset with highest index of close paren, if any
+          insiders = [];//numbers inside the current set of parens
+          insiderOps =[];//operators inside the current set of parens
+          //iterate through array looking for open parens
+          for(let index = 0; index < numbers.length; index++){
+            if(numbers[index][0]=="("){
+              //set openIndex to the highest index with an openParen
+              openIndex = index;
+            }
+          }
+          //if there is an openParen, find the closest closeParen
+          if(openIndex != -1){
+            for(let i = openIndex + 1; i < numbers.length; i++){
+              if(numbers[i][numbers[i].length - 1] == ")"){
+                closeIndex = i;
+                //1st one found breaks the loop
+                break;
+              }
+            }
+            console.log("open: " + openIndex + " close: " + closeIndex);
+            //now process the operations between the parentheses:
+            //add the numbers to an subset array (insiders), removing parens
+            //add the ops to a subset array (insiderOps)
+
+            //console.log("numbers, before push it insiders" + numbers);
+            //console.log("ops before push " + ops);
+
+            for(let k = openIndex; k <= closeIndex; k++){
+              console.log("when k is: " +k+" pre-push ops: " + ops);
+              insiderOps.push(ops[k]);//if closeIndex is the final element in the array, this is fine, otherwise yields one too many ops, so pop one at the end (line 141)
+
+              if(k == openIndex){
+                //remove used up ops
+                //ops.splice(k,1);
+
+                //remove paren, put into new array for processing
+                numbers[k] = numbers[k].slice(1,numbers[k].length);
+                insiders.push(numbers[k]);
+                //remove paren
+              }else if(k == closeIndex){
+                if(k!=numbers.length-1) //if the close paren was the last thing in the array, need to keep the last op (it preceded the entry)if there is something after the close paren,
+                //not sure if this should be ops or insiderOps right now.
+                {
+                  insiderOps.pop();
+                }
+                numbers[k] = numbers[k].slice(0,numbers[k].length-1);
+                insiders.push(numbers[k]);
+              }else{
+                //remove used up ops
+              //  ops.splice(k,1);
+                insiders.push(numbers[k]);
+              }
+            }
+            //remove the used up operators from ops
+            ops.splice(openIndex,closeIndex-openIndex);
+            console.log("insiders, after push it insiders: " + insiders);
+            console.log("insiderOps, after push it insiders: " + insiderOps);
+            console.log("ops, after push it insiders: " + ops);
+
+          //  insiderOps.pop();//remove last operator(because it is not followed by another number)
+          //send along the sub-arrays from inside the parentheses to be calculated
+
+            //set value at index of openParen to calculated value
+            //remove the other values from openIndex + 1 to closeIndex
+            //console.log("before consolidation " + numbers);
+            numbers[openIndex] = findMD(insiders,insiderOps);
+
+            numbers.splice(openIndex + 1,closeIndex - openIndex);
+            // console.log("pre-splice ops: " + ops);
+            // ops.splice(openIndex,closeIndex - openIndex);
+            // console.log("post-splice ops: " + ops);
+
+          //  console.log("after consolidation " + numbers);
+
+          }else{
+            //end while loop-- no more open parens
+            break;
+          }
+        }
+        console.log("Finished parens, numbers being sent " + numbers);
+        console.log("Finished parens ops being sent is:" + ops);
+        console.log(findMD(numbers,ops));
       }
 
-      function findMD()
+      function findMD(values,operators)
       {
-        numbers.push(entry.value);
-        console.log(numbers);
-        console.log(ops);
-
+        console.log("in find MD");
         while(true){
-          times = ops.indexOf("*");
-          div = ops.indexOf("/");
+          times = operators.indexOf("*");
+          div = operators.indexOf("/");
           //both * and / are in the operator array:
           if(times!= -1 && div != -1)
           {
@@ -112,56 +199,50 @@ search for "(" and ")" and perform those ops first?
             {
               console.log("times at " + times);
               //multiplies the two numbers together keeping the product at the index of the 1st factor, and removing the index of the 2nd factor.
-              console.log("1 " + numbers);
 
-              numbers[times] = numbers[times] * numbers[times + 1];
-              console.log("2 " + numbers);
+              values[times] = values[times] * values[times + 1];
 
-              numbers.splice(times + 1, 1);
-              console.log("3 " + numbers);
+              values.splice(times + 1, 1);
 
-              ops.splice(times,1);
+              operators.splice(times,1);
             }else{
-                console.log("div at " + div);
-                numbers[div] = numbers[div]/numbers[div + 1];
-                numbers.splice(div + 1, 1);
-                ops.splice(div,1);
+                values[div] = values[div]/values[div + 1];
+                values.splice(div + 1, 1);
+                operators.splice(div,1);
               }
           //they're not both there
           }else if(times != -1){
             console.log("times at " + times);
-            numbers[times] = numbers[times] * numbers[times + 1];
-            numbers.splice(times + 1, 1);
-            ops.splice(times,1);
+            values[times] = values[times] * values[times + 1];
+            values.splice(times + 1, 1);
+            operators.splice(times,1);
 
             }else if(div!= -1){
-              console.log("div at " + div);
-              numbers[div] = numbers[div]/numbers[div + 1];
-              numbers.splice(div + 1, 1);
-              ops.splice(div,1);
+              values[div] = values[div]/values[div + 1];
+              values.splice(div + 1, 1);
+              operators.splice(div,1);
             }else{
               break;
             }
-          console.log(ops);
-          console.log(numbers)
         }
-        addEmUp(numbers);
+        return(addEmUp(values, operators));
       }
 
-      function addEmUp()
+      function addEmUp(valAdd, opsAdd)
       {
         //start off the sum with the first element
-        var result = parseFloat(numbers.shift());
-        while(numbers.length > 0){
-          op = ops.shift();
+        var result = parseFloat(valAdd.shift());
+        while(valAdd.length > 0){
+          op = opsAdd.shift();
           if(op=="+"){
-            result += (parseFloat(numbers.shift()));
+            result += (parseFloat(valAdd.shift()));
           }else{
-            result -= parseFloat((numbers.shift()));
+            result -= parseFloat((valAdd.shift()));
           }
         }
         console.log(result);
         entry.value = result;
+        return result;
     }
     </script>
   </body>
