@@ -11,8 +11,7 @@ input{
 
 #buttons {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  grid-template-rows: 15%;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
 }
 
 button{
@@ -21,4 +20,8 @@ button{
 #display{
   font-size: 8em;
   text-align: center;
+}
+
+#equals{
+  grid-column: 4;
 }
