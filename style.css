@@ -1,0 +1,24 @@
+*{
+  background-color: blue;
+}
+
+input{
+  width:100%;
+  height:15vh;
+  font-size: 3em;
+  text-align: center;
+}
+
+#buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 15%;
+}
+
+button{
+  font-size: 3em;
+}
+#display{
+  font-size: 8em;
+  text-align: center;
+}

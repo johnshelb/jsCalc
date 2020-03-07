@@ -2,24 +2,26 @@
 <html lang="en" dir="ltr">
   <head>
     <meta charset="utf-8">
-    <title></title>
+    <title>js Calculator</title>
+    <link rel="stylesheet" href="style.css">
   </head>
   <body>
     <input id="entry" type="text">
-    <button type="button" name="button" onclick="entry.value += '1';display.innerText+='1'">1</button>
-    <button type="button" name="button" onclick="entry.value  += '2';display.innerText+='2'">2</button>
-    <button type="button" name="button" onclick="entry.value += '3';display.innerText+='3'">3</button>
-    <button type="button" name="button" onclick="entry.value += '4';display.innerText+='4'">4</button>
-    <button type="button" name="button" onclick="entry.value += '5';display.innerText+='5'">5</button>
-    <button type="button" name="button" onclick="entry.value += '6';display.innerText+='6'">6</button>
-    <button type="button" name="button" onclick="entry.value += '7';display.innerText+='7'">7</button>
-    <button type="button" name="button" onclick="entry.value += '8';display.innerText+='8'">8</button>
-    <button type="button" name="button" onclick="entry.value += '9';display.innerText+='9'">9</button>
-    <button type="button" name="button" onclick="entry.value += '0';display.innerText+='0'">0</button>
-    <button type="button" name="button" onclick="entry.value += '.';display.innerText+='.'">.</button>
-    <button type="button" name="button" onclick="openParen()">(</button>
-    <button type="button" name="button" onclick="closeParen()">)</button>
-    <button type="button" name="button" onclick="entry.value = entry.value/100;display.innerText+='%'">%</button>
+    <div id = "buttons">
+      <button type="button" name="button" onclick="entry.value += '1';display.innerText+='1'">1</button>
+      <button type="button" name="button" onclick="entry.value  += '2';display.innerText+='2'">2</button>
+      <button type="button" name="button" onclick="entry.value += '3';display.innerText+='3'">3</button>
+      <button type="button" name="button" onclick="entry.value += '4';display.innerText+='4'">4</button>
+      <button type="button" name="button" onclick="entry.value += '5';display.innerText+='5'">5</button>
+      <button type="button" name="button" onclick="entry.value += '6';display.innerText+='6'">6</button>
+      <button type="button" name="button" onclick="entry.value += '7';display.innerText+='7'">7</button>
+      <button type="button" name="button" onclick="entry.value += '8';display.innerText+='8'">8</button>
+      <button type="button" name="button" onclick="entry.value += '9';display.innerText+='9'">9</button>
+      <button type="button" name="button" onclick="entry.value += '0';display.innerText+='0'">0</button>
+      <button type="button" name="button" onclick="entry.value += '.';display.innerText+='.'">.</button>
+      <button type="button" name="button" onclick="openParen()">(</button>
+      <button type="button" name="button" onclick="closeParen()">)</button>
+      <button type="button" name="button" onclick="entry.value = entry.value/100;display.innerText+='%'">%</button>
 
     <button type="button" name="button" onclick="add()">+</button>
     <button type="button" name="button" onclick="subtract()">-</button>
@@ -28,6 +30,7 @@
     <button type="button" name="button" onclick="resolveParens()">=</button>
     <button type="button" name="button" onclick="clearEntry()">Clear Entry</button>
     <button type="button" name="button" onclick="clearIt()">Clear</button>
+  </div>
     <div id='display'>
 
     </div>
@@ -77,7 +80,7 @@
           }
         }
 
-      function add(){
+       function add(){
         if(entry.value!=""){
           pushValue(entry.value);
         }
@@ -147,6 +150,7 @@
           numbers.push(entry.value);
           master.push(entry.value);
         }
+console.log("148 begin.  numbers: " + numbers + " ops: " + ops);
         display.innerText = master.join(" ")
         //loop through all sets of parens, break if no more open parens
         while(true){
@@ -175,14 +179,22 @@
             //add the ops to a subset array (insiderOps)
 
             for(let k = openIndex + 1; k < closeIndex; k++){
-              insiderOps.push(ops[k]);
               insiders.push(numbers[k]);
+              insiderOps.push(ops[k]);
             }
             //remove the used up operators from ops
+console.log("189 insiders " + insiders + " insiderops " + insiderOps);
+
+console.log("resP 188 preSplice ops: " + ops)
+
             ops.splice(openIndex,closeIndex - openIndex);
 
+console.log("resP 192 POSTSplice ops: " + ops)
+
             //set value at index of openParen to calculated value
-            numbers[openIndex] = findMD(insiders,insiderOps);
+console.log("195 SEND TO MD sending from 195")
+            numbers[openIndex] = findMD(insiders,insiderOps)
+console.log("at 197, returned value from parens processing is " + numbers[openIndex]);
             //remove the other values from openIndex + 1 to closeIndex
             numbers.splice(openIndex + 1,closeIndex - openIndex);
           }else{
@@ -190,14 +202,19 @@
             break;
           }
         }
+console.log("ENDSENDtoMD sending from 200. numbers: " +numbers + "ops: " + ops )
         findMD(numbers,ops);
       }
 
       function findMD(values,operators)
       {
+console.log("in findMD " + values  + " " + operators);
         while(true){
           times = operators.indexOf("*");
           div = operators.indexOf("/");
+console.log("215 times: " + times + "div: " + div);
+console.log("216 val: " +values +"op: " + operators)
+
           //both * and / are in the operator array:
           if(times!= -1 && div != -1){
             //choose the one closer to the front of the array
@@ -213,23 +230,27 @@
               }
           //they're not both there
           }else if(times != -1){
+console.log("233 val: " + values + " op: " + operators)
             values[times] = values[times] * values[times + 1];
             values.splice(times + 1, 1);
             operators.splice(times,1);
-
-            }else if(div!= -1){
-              values[div] = values[div]/values[div + 1];
-              values.splice(div + 1, 1);
-              operators.splice(div,1);
-            }else{
-              break;
-            }
+console.log("237 val: " + values + " op: " + operators)
+          }else if(div!= -1){
+            values[div] = values[div]/values[div + 1];
+            values.splice(div + 1, 1);
+            operators.splice(div,1);
+          }else{
+            break;
+          }
         }
+console.log("245 FinalSENDING to add " + "v: " + values + " o: " + operators)
         return(addEmUp(values, operators));
       }
 
       function addEmUp(valAdd, opsAdd)
       {
+console.log("IN to add " + "v: " + valAdd + " o: " + opsAdd)
+
         //start off the sum with the first element
         var result = parseFloat(valAdd.shift());
         while(valAdd.length > 0){
@@ -240,13 +261,13 @@
             result -= parseFloat((valAdd.shift()));
           }
         }
+console.log("result: " + result);
+console.log("257 num: " +numbers +" op: " + ops)
         entry.value = result;
         display.innerText = master.join(" ") + " = " + result;
-        numbers = [];
-        ops = [];
-        master = [];
         return result;
     }
     </script>
   </body>
 </html>
+<!--  -->
