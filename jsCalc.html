@@ -6,204 +6,205 @@
   </head>
   <body>
     <input id="entry" type="text">
-    <button type="button" name="button" onclick="entry.value += '1'">1</button>
-    <button type="button" name="button" onclick="entry.value  += '2'">2</button>
-    <button type="button" name="button" onclick="entry.value += '3'">3</button>
-    <button type="button" name="button" onclick="entry.value += '4'">4</button>
-    <button type="button" name="button" onclick="entry.value += '5'">5</button>
-    <button type="button" name="button" onclick="entry.value += '6'">6</button>
-    <button type="button" name="button" onclick="entry.value += '7'">7</button>
-    <button type="button" name="button" onclick="entry.value += '8'">8</button>
-    <button type="button" name="button" onclick="entry.value += '9'">9</button>
-    <button type="button" name="button" onclick="entry.value += '0'">0</button>
-    <button type="button" name="button" onclick="entry.value += '.'">.</button>
-    <button type="button" name="button" onclick="entry.value = entry.value/100">%</button>
+    <button type="button" name="button" onclick="entry.value += '1';display.innerText+='1'">1</button>
+    <button type="button" name="button" onclick="entry.value  += '2';display.innerText+='2'">2</button>
+    <button type="button" name="button" onclick="entry.value += '3';display.innerText+='3'">3</button>
+    <button type="button" name="button" onclick="entry.value += '4';display.innerText+='4'">4</button>
+    <button type="button" name="button" onclick="entry.value += '5';display.innerText+='5'">5</button>
+    <button type="button" name="button" onclick="entry.value += '6';display.innerText+='6'">6</button>
+    <button type="button" name="button" onclick="entry.value += '7';display.innerText+='7'">7</button>
+    <button type="button" name="button" onclick="entry.value += '8';display.innerText+='8'">8</button>
+    <button type="button" name="button" onclick="entry.value += '9';display.innerText+='9'">9</button>
+    <button type="button" name="button" onclick="entry.value += '0';display.innerText+='0'">0</button>
+    <button type="button" name="button" onclick="entry.value += '.';display.innerText+='.'">.</button>
+    <button type="button" name="button" onclick="openParen()">(</button>
+    <button type="button" name="button" onclick="closeParen()">)</button>
+    <button type="button" name="button" onclick="entry.value = entry.value/100;display.innerText+='%'">%</button>
 
-    <button type="button" name="button" onclick="add()">add</button>
-    <button type="button" name="button" onclick="subtract()">subtract</button>
-    <button type="button" name="button" onclick="multiply()">multiply</button>
-    <button type="button" name="button" onclick="divide()">divide</button>
-    <button type="button" name="button" onclick="resolveParens()">equals</button>
+    <button type="button" name="button" onclick="add()">+</button>
+    <button type="button" name="button" onclick="subtract()">-</button>
+    <button type="button" name="button" onclick="multiply()">*</button>
+    <button type="button" name="button" onclick="divide()">/</button>
+    <button type="button" name="button" onclick="resolveParens()">=</button>
     <button type="button" name="button" onclick="clearEntry()">Clear Entry</button>
-    <button type="button" name="button" onclick="clearIt()">clear</button>
+    <button type="button" name="button" onclick="clearIt()">Clear</button>
+    <div id='display'>
+
+    </div>
 
     <script>
-/*clicking operator functions trigger storage and clearance of number typed into textbox, as well as initializing a signal variable identifying which operator has been invoked, both of which will be passed on to the equals function which will also take the next number in the text field
-
-issue: first design ideas may favor a simplistic vision in which the user only enters two numbers before getting the result, but in a real calculator, chaining operations is common.
-account for parentheses?
-*/
-
-/*
-Maybe have 2 arrays, one storing the entered values, in order, and the other storing the ops.  Then, when the equals button is pushed, shift the elements out of the array to perform the operations
-
-search for * or / to honor order of operations
-
-search for "(" and ")" and perform those ops first?
-*/
       var numbers = [];
       var ops = [];
+      var master=[];
       var entry = document.getElementById("entry");
+      var display = document.getElementById("display");
+
       entry.value = "";
       entry.focus();
 
+      function openParen(){
+        display.innerText+='('
+        entry.value += '(';
+        numbers.push("(");
+        ops.push("(");
+        master.push("(")
+      }
+
+      function closeParen()
+      {
+        if(master[master.length - 1]!=")"){
+          numbers.push(entry.value);
+          master.push(entry.value);
+        }
+        entry.value += ')';
+        numbers.push(")");
+        ops.push(")");
+        master.push(")");
+        display.innerText = master.join(" ")
+      }
+
+//only get here from an operator, passing the value from entry.value, never from the final term ('=' sends to resolveParens())
+    function pushValue(val){
+      //recursively removes all the opening parens from entry.value because they were already pushed into the array when entered
+      if(val[0]=="("){
+          val = val.slice(1,val.length);
+          pushValue(val);
+          //prevents push if the value ends with closeParen because would have been pushed into the array when entered
+        }else if(val[val.length - 1]!=")"){
+            numbers.push(val);
+            master.push(val);
+            display.innerText = master.join(" ")
+          }
+        }
+
       function add(){
-        numbers.push(entry.value);
+        if(entry.value!=""){
+          pushValue(entry.value);
+        }
         ops.push("+");
-    //    console.log("ops is " + ops);
+        master.push("+");
+        display.innerText = master.join(" ")
         entry.value = "";
         entry.focus();
       }
 
       function subtract(){
-        numbers.push(entry.value);
+        if(entry.value!=""){
+          pushValue(entry.value);
+        }
         ops.push("-");
+        master.push("-");
+        display.innerText = master.join(" ")
         entry.value = "";
         entry.focus();
       }
 
       function multiply(){
-        numbers.push(entry.value);
+        if(entry.value!=""){
+          pushValue(entry.value);
+        }
         ops.push("*");
-    //    console.log("ops is " + ops);
+        master.push("*");
+        display.innerText = master.join(" ")
         entry.value = "";
         entry.focus();
       }
 
       function divide(){
-        numbers.push(entry.value);
+        if(entry.value!=""){
+          pushValue(entry.value);
+        }
         ops.push("/");
-      //  console.log("ops is " + ops);
+        master.push("/");
+        display.innerText = master.join(" ")
         entry.value = "";
         entry.focus();
       }
 
       function clearIt(){
+        display.innerText = ''
         entry.value = "";
         numbers = [];
         ops = [];
+        master = [];
         entry.focus();
       }
 
       function clearEntry(){
+        if(entry.value[entry.value.length-1]==")"){
+          numbers.pop();
+        }
         entry.value = "";
-        numbers.pop;
+        ops.pop();
+        master.pop();
+        display.innerText = master.join(" ")
         entry.focus();
       }
 
-
       function resolveParens(){
-        numbers.push(entry.value);
-
-        console.log("at beginning, numbers is " + numbers + " and ops is " + ops);
-        //get the final entry
-        //do this for all sets of parens, break if no more open parens
-        while(true)
-        {
+        //push in final entry, unless it has a closeParen, because that would have been pushed when entered
+        if(entry.value[entry.value.length-1]!=")"){
+          numbers.push(entry.value);
+          master.push(entry.value);
+        }
+        display.innerText = master.join(" ")
+        //loop through all sets of parens, break if no more open parens
+        while(true){
           openIndex = -1;//will be reset with highest index of open paren, if any
           closeIndex = -1;//will be reset with highest index of close paren, if any
           insiders = [];//numbers inside the current set of parens
           insiderOps =[];//operators inside the current set of parens
           //iterate through array looking for open parens
           for(let index = 0; index < numbers.length; index++){
-            if(numbers[index][0]=="("){
+            if(numbers[index]=="("){
               //set openIndex to the highest index with an openParen
               openIndex = index;
             }
           }
-          //if there is an openParen, find the closest closeParen
+          //if an openParen was found, find the closest closeParen
           if(openIndex != -1){
             for(let i = openIndex + 1; i < numbers.length; i++){
-              if(numbers[i][numbers[i].length - 1] == ")"){
+              if(numbers[i] == ")"){
                 closeIndex = i;
                 //1st one found breaks the loop
                 break;
               }
             }
-            console.log("open: " + openIndex + " close: " + closeIndex);
             //now process the operations between the parentheses:
             //add the numbers to an subset array (insiders), removing parens
             //add the ops to a subset array (insiderOps)
 
-            //console.log("numbers, before push it insiders" + numbers);
-            //console.log("ops before push " + ops);
-
-            for(let k = openIndex; k <= closeIndex; k++){
-              console.log("when k is: " +k+" pre-push ops: " + ops);
-              insiderOps.push(ops[k]);//if closeIndex is the final element in the array, this is fine, otherwise yields one too many ops, so pop one at the end (line 141)
-
-              if(k == openIndex){
-                //remove used up ops
-                //ops.splice(k,1);
-
-                //remove paren, put into new array for processing
-                numbers[k] = numbers[k].slice(1,numbers[k].length);
-                insiders.push(numbers[k]);
-                //remove paren
-              }else if(k == closeIndex){
-                if(k!=numbers.length-1) //if the close paren was the last thing in the array, need to keep the last op (it preceded the entry)if there is something after the close paren,
-                //not sure if this should be ops or insiderOps right now.
-                {
-                  insiderOps.pop();
-                }
-                numbers[k] = numbers[k].slice(0,numbers[k].length-1);
-                insiders.push(numbers[k]);
-              }else{
-                //remove used up ops
-              //  ops.splice(k,1);
-                insiders.push(numbers[k]);
-              }
+            for(let k = openIndex + 1; k < closeIndex; k++){
+              insiderOps.push(ops[k]);
+              insiders.push(numbers[k]);
             }
             //remove the used up operators from ops
-            ops.splice(openIndex,closeIndex-openIndex);
-            console.log("insiders, after push it insiders: " + insiders);
-            console.log("insiderOps, after push it insiders: " + insiderOps);
-            console.log("ops, after push it insiders: " + ops);
-
-          //  insiderOps.pop();//remove last operator(because it is not followed by another number)
-          //send along the sub-arrays from inside the parentheses to be calculated
+            ops.splice(openIndex,closeIndex - openIndex);
 
             //set value at index of openParen to calculated value
-            //remove the other values from openIndex + 1 to closeIndex
-            //console.log("before consolidation " + numbers);
             numbers[openIndex] = findMD(insiders,insiderOps);
-
+            //remove the other values from openIndex + 1 to closeIndex
             numbers.splice(openIndex + 1,closeIndex - openIndex);
-            // console.log("pre-splice ops: " + ops);
-            // ops.splice(openIndex,closeIndex - openIndex);
-            // console.log("post-splice ops: " + ops);
-
-          //  console.log("after consolidation " + numbers);
-
           }else{
-            //end while loop-- no more open parens
+            //no more open parens, end while loop
             break;
           }
         }
-        console.log("Finished parens, numbers being sent " + numbers);
-        console.log("Finished parens ops being sent is:" + ops);
-        console.log(findMD(numbers,ops));
+        findMD(numbers,ops);
       }
 
       function findMD(values,operators)
       {
-        console.log("in find MD");
         while(true){
           times = operators.indexOf("*");
           div = operators.indexOf("/");
           //both * and / are in the operator array:
-          if(times!= -1 && div != -1)
-          {
+          if(times!= -1 && div != -1){
             //choose the one closer to the front of the array
-            if(times < div)
-            {
-              console.log("times at " + times);
+            if(times < div){
               //multiplies the two numbers together keeping the product at the index of the 1st factor, and removing the index of the 2nd factor.
-
               values[times] = values[times] * values[times + 1];
-
               values.splice(times + 1, 1);
-
               operators.splice(times,1);
             }else{
                 values[div] = values[div]/values[div + 1];
@@ -212,7 +213,6 @@ search for "(" and ")" and perform those ops first?
               }
           //they're not both there
           }else if(times != -1){
-            console.log("times at " + times);
             values[times] = values[times] * values[times + 1];
             values.splice(times + 1, 1);
             operators.splice(times,1);
@@ -240,8 +240,11 @@ search for "(" and ")" and perform those ops first?
             result -= parseFloat((valAdd.shift()));
           }
         }
-        console.log(result);
         entry.value = result;
+        display.innerText = master.join(" ") + " = " + result;
+        numbers = [];
+        ops = [];
+        master = [];
         return result;
     }
     </script>
